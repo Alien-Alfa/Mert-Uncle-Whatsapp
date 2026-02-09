@@ -288,8 +288,8 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            if (messageCount < 1 || messageCount > 100) {
-                socket.emit('send-error', { message: 'Message count must be between 1 and 100' });
+            if (messageCount < 1 || messageCount > 10000) {
+                socket.emit('send-error', { message: 'Message count must be between 1 and 10,000' });
                 return;
             }
 

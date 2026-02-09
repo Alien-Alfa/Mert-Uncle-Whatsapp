@@ -55,7 +55,7 @@ http://localhost:3000
 Once connected, you'll see the message sending form:
 
 1. **Target Phone Number**: Enter the recipient's number with country code (e.g., +1234567890)
-2. **Number of Messages**: Choose how many messages to send (1-100)
+2. **Number of Messages**: Choose how many messages to send (1-10,000)
 3. **Delay**: Set the delay between messages in milliseconds (1000-60000ms)
 4. Click the **⭐ Start Sending** button
 
@@ -84,7 +84,7 @@ DEMO_MODE=true npm start
 ## Security Features 🛡️
 
 - **Input Validation**: All inputs are validated on both frontend and backend
-- **Rate Limiting**: Message count limited to 100 per batch
+- **Rate Limiting**: Message count limited to 10,000 per batch
 - **Delay Enforcement**: Minimum 1 second delay between messages
 - **Phone Number Validation**: Ensures proper format with country code
 - **Error Boundaries**: Graceful error handling throughout the application

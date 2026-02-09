@@ -15,7 +15,7 @@ A WhatsApp bot with a beautiful web interface using @whiskeysockets/baileys libr
 
 ## Prerequisites 📋
 
-- Node.js (v16 or higher)
+- Node.js (v20 or higher)
 - npm or yarn
 - A WhatsApp account
 
@@ -68,10 +68,17 @@ Once connected, you'll see the message sending form:
 
 ## Configuration ⚙️
 
-The server runs on port 3000 by default. You can change this by setting the `PORT` environment variable:
+The server runs on port 3000 by default. You can customize settings using environment variables:
 
 ```bash
+# Change server port
 PORT=8080 npm start
+
+# Customize bot name in messages
+BOT_NAME="My Custom Bot" npm start
+
+# Enable demo mode for testing
+DEMO_MODE=true npm start
 ```
 
 ## Security Features 🛡️

@@ -6,7 +6,8 @@ const QRCode = require('qrcode');
 const pino = require('pino');
 const path = require('path');
 
-// Check if demo mode is enabled
+// Configuration
+const BOT_NAME = process.env.BOT_NAME || 'Mert Uncle Bot';
 const DEMO_MODE = process.env.DEMO_MODE === 'true';
 
 // Initialize Express app
@@ -133,14 +134,16 @@ function validatePhoneNumber(number) {
     // Remove all non-numeric characters except '+'
     const cleaned = number.replace(/[^\d+]/g, '');
     
-    // Check if it starts with '+' and has at least 10 digits
-    if (cleaned.startsWith('+') && cleaned.length >= 11) {
-        return cleaned.substring(1) + '@s.whatsapp.net';
-    } else if (!cleaned.startsWith('+') && cleaned.length >= 10) {
-        return cleaned + '@s.whatsapp.net';
+    // Extract the number without '+'
+    const numericPart = cleaned.replace(/\+/g, '');
+    
+    // Check if we have at least 10 digits
+    if (numericPart.length < 10) {
+        return null;
     }
     
-    return null;
+    // Return in WhatsApp format (without '+')
+    return numericPart + '@s.whatsapp.net';
 }
 
 // Send messages function
@@ -208,7 +211,7 @@ async function sendMessages(targetNumber, messageCount, delayMs) {
     try {
         for (let i = 1; i <= messageCount; i++) {
             try {
-                const message = `Message ${i} of ${messageCount} from Mert Uncle Bot`;
+                const message = `Message ${i} of ${messageCount} from ${BOT_NAME}`;
                 await sock.sendMessage(formattedNumber, { text: message });
                 successCount++;
                 

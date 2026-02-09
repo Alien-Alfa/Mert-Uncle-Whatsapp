@@ -5,6 +5,7 @@ const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = requi
 const QRCode = require('qrcode');
 const pino = require('pino');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 // Configuration
 const BOT_NAME = process.env.BOT_NAME || 'Mert Uncle Bot';
@@ -14,6 +15,16 @@ const DEMO_MODE = process.env.DEMO_MODE === 'true';
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bot - Mert Uncle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.disconnected {
+            background: #fee;
+            color: #c33;
+        }
+
+        .connection-status.connected {
+            background: #efe;
+            color: #3c3;
+        }
+
+        .connection-status.qr {
+            background: #fef3cd;
+            color: #856404;
+        }
+
+        .lock-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .qr-section.active {
+            display: block;
+        }
+
+        .qr-section h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-code img {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+        }
+
+        .qr-instructions {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+        }
+        
+        .demo-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .star-icon {
+            font-size: 18px;
+        }
+
+        .progress-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            display: none;
+        }
+
+        .loading-text.active {
+            display: inline-block;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 WhatsApp Bot - Mert Uncle<span id="demoBadge" class="demo-badge" style="display:none;">DEMO MODE</span></h1>
+        </div>
+
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status disconnected">
+            <svg class="lock-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+            </svg>
+            <span id="statusText">Disconnected</span>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertBox" class="alert"></div>
+
+        <!-- QR Code Section -->
+        <div id="qrSection" class="qr-section">
+            <h2>Scan QR Code</h2>
+            <div class="qr-code">
+                <img id="qrImage" src="" alt="QR Code">
+            </div>
+            <div class="qr-instructions">
+                Open WhatsApp on your phone → Settings → Linked Devices → Link a Device → Scan this QR code
+            </div>
+            <button id="demoConnectBtn" class="btn btn-success" style="display:none; margin-top: 20px;">
+                🔓 Simulate Connection (Demo)
+            </button>
+        </div>
+
+        <!-- Message Form -->
+        <div id="formSection" class="form-section">
+            <div class="form-group">
+                <label for="targetNumber">Target Phone Number</label>
+                <input 
+                    type="text" 
+                    id="targetNumber" 
+                    placeholder="+1234567890"
+                    pattern="[+]?[0-9]+"
+                >
+                <div class="input-hint">Include country code (e.g., +1 for USA, +91 for India)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="messageCount">Number of Messages</label>
+                <input 
+                    type="number" 
+                    id="messageCount" 
+                    placeholder="10"
+                    min="1"
+                    max="10000"
+                    value="10"
+                >
+                <div class="input-hint">Between 1 and 10,000 messages</div>
+            </div>
+
+            <div class="form-group">
+                <label for="delayMs">Delay Between Messages (milliseconds)</label>
+                <input 
+                    type="number" 
+                    id="delayMs" 
+                    placeholder="2000"
+                    min="1000"
+                    max="60000"
+                    step="1000"
+                    value="2000"
+                >
+                <div class="input-hint">Between 1000ms (1s) and 60000ms (60s)</div>
+            </div>
+
+            <div class="button-group">
+                <button id="startBtn" class="btn btn-primary">
+                    <span class="star-icon">⭐</span>
+                    <span id="btnText">Start Sending</span>
+                    <div class="spinner" style="display: none;" id="btnSpinner"></div>
+                </button>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progressSection" class="progress-section">
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar" style="width: 0%">0%</div>
+            </div>
+            <div class="progress-stats">
+                <span>Messages: <strong id="progressCurrent">0</strong>/<strong id="progressTotal">0</strong></span>
+                <span>✓ Success: <strong id="progressSuccess">0</strong></span>
+                <span>✗ Errors: <strong id="progressErrors">0</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Initialize Socket.IO
+        const socket = io();
+
+        // DOM Elements
+        const connectionStatus = document.getElementById('connectionStatus');
+        const statusText = document.getElementById('statusText');
+        const qrSection = document.getElementById('qrSection');
+        const qrImage = document.getElementById('qrImage');
+        const formSection = document.getElementById('formSection');
+        const startBtn = document.getElementById('startBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressCurrent = document.getElementById('progressCurrent');
+        const progressTotal = document.getElementById('progressTotal');
+        const progressSuccess = document.getElementById('progressSuccess');
+        const progressErrors = document.getElementById('progressErrors');
+        const alertBox = document.getElementById('alertBox');
+        const targetNumber = document.getElementById('targetNumber');
+        const messageCount = document.getElementById('messageCount');
+        const delayMs = document.getElementById('delayMs');
+        const demoConnectBtn = document.getElementById('demoConnectBtn');
+        const demoBadge = document.getElementById('demoBadge');
+
+        let isConnected = false;
+        let isSending = false;
+        let isDemoMode = false;
+
+        // Show alert message
+        function showAlert(message, type = 'info') {
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type} active`;
+            setTimeout(() => {
+                alertBox.classList.remove('active');
+            }, 5000);
+        }
+
+        // Update connection status UI
+        function updateConnectionStatus(state, connected, demoMode = false) {
+            isConnected = connected;
+            isDemoMode = demoMode;
+            
+            // Show demo badge if in demo mode
+            if (demoMode) {
+                demoBadge.style.display = 'inline-block';
+                demoConnectBtn.style.display = 'block';
+            }
+            
+            if (connected) {
+                connectionStatus.className = 'connection-status connected';
+                statusText.innerHTML = '<span>🔓</span> Connected';
+                qrSection.classList.remove('active');
+                formSection.classList.add('active');
+            } else if (state === 'qr') {
+                connectionStatus.className = 'connection-status qr';
+                statusText.innerHTML = '<span>🔒</span> Scan QR Code';
+                qrSection.classList.add('active');
+                formSection.classList.remove('active');
+            } else {
+                connectionStatus.className = 'connection-status disconnected';
+                statusText.innerHTML = '<span>🔒</span> Disconnected';
+                qrSection.classList.remove('active');
+                formSection.classList.remove('active');
+            }
+        }
+
+        // Socket event handlers
+        socket.on('connection-state', (data) => {
+            updateConnectionStatus(data.state, data.connected, data.demoMode);
+        });
+
+        socket.on('qr', (qrData) => {
+            qrImage.src = qrData;
+            qrSection.classList.add('active');
+            showAlert('Please scan the QR code with your phone', 'info');
+        });
+
+        socket.on('connected', (data) => {
+            showAlert(data.message, 'success');
+            updateConnectionStatus('connected', true, isDemoMode);
+        });
+
+        socket.on('logged-out', (data) => {
+            showAlert(data.message, 'info');
+            updateConnectionStatus('disconnected', false, isDemoMode);
+            resetProgress();
+        });
+
+        socket.on('error', (data) => {
+            showAlert('Error: ' + data.message, 'error');
+        });
+
+        socket.on('message-progress', (data) => {
+            const percentage = Math.round((data.current / data.total) * 100);
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+            progressCurrent.textContent = data.current;
+            progressTotal.textContent = data.total;
+            progressSuccess.textContent = data.success;
+            progressErrors.textContent = data.errors;
+        });
+
+        socket.on('message-error', (data) => {
+            console.error('Message error:', data);
+        });
+
+        socket.on('send-complete', (data) => {
+            isSending = false;
+            startBtn.disabled = false;
+            btnText.textContent = 'Start Sending';
+            btnSpinner.style.display = 'none';
+            
+            const message = `Completed! ✓ ${data.success} sent, ✗ ${data.errors} errors`;
+            showAlert(message, data.errors > 0 ? 'info' : 'success');
+        });
+
+        socket.on('send-error', (data) => {
+            isSending = false;
+            startBtn.disabled = false;
+            btnText.textContent = 'Start Sending';
+            btnSpinner.style.display = 'none';
+            showAlert('Error: ' + data.message, 'error');
+        });
+
+        // Reset progress UI
+        function resetProgress() {
+            progressSection.classList.remove('active');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressCurrent.textContent = '0';
+            progressTotal.textContent = '0';
+            progressSuccess.textContent = '0';
+            progressErrors.textContent = '0';
+        }
+
+        // Start button handler
+        startBtn.addEventListener('click', () => {
+            if (isSending || !isConnected) {
+                return;
+            }
+
+            // Validation
+            const target = targetNumber.value.trim();
+            const count = parseInt(messageCount.value);
+            const delay = parseInt(delayMs.value);
+
+            if (!target) {
+                showAlert('Please enter a target phone number', 'error');
+                targetNumber.focus();
+                return;
+            }
+
+            if (!count || count < 1 || count > 10000) {
+                showAlert('Message count must be between 1 and 10,000', 'error');
+                messageCount.focus();
+                return;
+            }
+
+            if (!delay || delay < 1000 || delay > 60000) {
+                showAlert('Delay must be between 1000ms and 60000ms', 'error');
+                delayMs.focus();
+                return;
+            }
+
+            // Start sending
+            isSending = true;
+            startBtn.disabled = true;
+            btnText.textContent = 'Sending...';
+            btnSpinner.style.display = 'inline-block';
+            progressSection.classList.add('active');
+            resetProgress();
+
+            socket.emit('send-messages', {
+                targetNumber: target,
+                messageCount: count,
+                delay: delay
+            });
+        });
+
+        // Logout button handler
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                socket.emit('logout');
+            }
+        });
+        
+        // Demo connect button handler
+        demoConnectBtn.addEventListener('click', () => {
+            socket.emit('demo-connect');
+        });
+
+        // Disable form while sending
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            showAlert('Disconnected from server. Reconnecting...', 'error');
+        });
+
+        // Initialize
+        console.log('WhatsApp Bot Interface loaded');
+    </script>
+</body>
+</html>
